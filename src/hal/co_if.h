@@ -25,7 +25,7 @@ extern "C" {
 * INCLUDES
 ******************************************************************************/
 
-#include "co_types.h"
+#include "../core/co_types.h"
 #include "co_if_can.h"
 #include "co_if_timer.h"
 #include "co_if_nvm.h"
