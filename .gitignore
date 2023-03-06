@@ -7,3 +7,5 @@ Testing/*
 #allow
 !.vscode/settings.json
 !.vscode/extensions.json
+/Release/
+/Debug/
