@@ -21,6 +21,15 @@
 #include "co_core.h"
 
 /******************************************************************************
+* PRIVATE TYPEDEFS
+******************************************************************************/
+
+typedef union {
+    uint32_t rawValue;
+    float floatValue;
+} floatToUInt;
+
+/******************************************************************************
 * PRIVATE DEFINES
 ******************************************************************************/
 
@@ -66,23 +75,21 @@ static uint32_t COTReal32Size(struct CO_OBJ_T *obj, struct CO_NODE_T *node, uint
 static CO_ERR COTReal32Read(struct CO_OBJ_T *obj, struct CO_NODE_T *node, void *buffer, uint32_t size)
 {
     CO_ERR result = CO_ERR_NONE;
-    float value;
+    floatToUInt value;
 
     CO_UNUSED(node);
     ASSERT_PTR_ERR(obj, CO_ERR_BAD_ARG);
     ASSERT_PTR_ERR(buffer, CO_ERR_BAD_ARG);
 
     if (CO_IS_DIRECT(obj->Key) != 0) {
-        uint32_t rawValue = (uint32_t)(obj->Data);
-        value = *((float*)(&rawValue));
+    	value.rawValue = (uint32_t)(obj->Data);
     } else {
         uint32_t* rawValuePtr = (uint32_t*)(obj->Data);
-        uint32_t rawValue = *rawValuePtr;
-        value = *((float*)(&rawValue));
+        value.rawValue = *rawValuePtr;
     }
 
     if (size == COT_ENTRY_SIZE) {
-        *((float*)buffer) = value;
+        *((float*)buffer) = value.floatValue;
     } else {
         result = CO_ERR_BAD_ARG;
     }
@@ -93,7 +100,7 @@ static CO_ERR COTReal32Read(struct CO_OBJ_T *obj, struct CO_NODE_T *node, void *
 static CO_ERR COTReal32Write(struct CO_OBJ_T *obj, struct CO_NODE_T *node, void *buffer, uint32_t size)
 {
     CO_ERR result = CO_ERR_NONE;
-    float value;
+    floatToUInt value;
     uint32_t encodedValue;
     uint32_t oldValue;
 
@@ -101,8 +108,8 @@ static CO_ERR COTReal32Write(struct CO_OBJ_T *obj, struct CO_NODE_T *node, void 
     ASSERT_PTR_ERR(obj, CO_ERR_BAD_ARG);
     ASSERT_PTR_ERR(buffer, CO_ERR_BAD_ARG);
 
-    value = *((float *)buffer);
-    encodedValue = *((uint32_t *)(&value)); // get IEEE754 encoding of float value
+    value.floatValue = *((float *)buffer);
+    encodedValue = *((uint32_t *)(&value.rawValue)); // get IEEE754 encoding of float value
 
     if (size == COT_ENTRY_SIZE) {
     	//CO_IS_NODEID is not supported
