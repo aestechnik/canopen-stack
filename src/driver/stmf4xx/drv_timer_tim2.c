@@ -89,7 +89,7 @@ static void DrvTimerInit(uint32_t freq)
      * (note: the timer reloads to 0 on this overflow)
      */
     DrvTimer2.Instance = TIM2;
-    DrvTimer2.Init.Prescaler = 90;
+    DrvTimer2.Init.Prescaler = 16;					//scaled to fit current board config of APB1 = 16Mhz -> still 1 Mhz counter
     DrvTimer2.Init.CounterMode = TIM_COUNTERMODE_UP;
     DrvTimer2.Init.Period = 4294967295;
     DrvTimer2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -140,6 +140,16 @@ static void DrvTimerReload(uint32_t reload)
 {
     /* configure the next hardware timer interrupt */
     __HAL_TIM_SET_AUTORELOAD(&DrvTimer2, reload);
+
+	#ifdef DEBUG
+	//experimental safeguard against ARR > CNT bug during debugging
+    //TODO: check if this bug also happens with Release builds
+    //probably happens during multiple debug interrupts while CNT is going up during timer creation
+
+	if(DrvTimer2.Instance->CNT > reload) {
+	    __HAL_TIM_SET_AUTORELOAD(&DrvTimer2, DrvTimer2.Instance->CNT + 100);
+	}
+	#endif
 }
 
 static void DrvTimerStop(void)
