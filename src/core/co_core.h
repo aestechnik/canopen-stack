@@ -26,6 +26,7 @@ extern "C" {
 ******************************************************************************/
 
 #include "co_types.h"
+#include "can_cfg.h" //TODO: move this to the intended wrapper when the preprocessor is fixed
 #include "co_cfg.h"
 
 /* basic types */
