@@ -322,6 +322,9 @@ CO_ERR COSdoDownloadExpedited(CO_SDO *srv)
     size = COSdoGetSize(srv, width, true);
     if ((size > 0) && (size <= 4)) {
         data   = CO_GET_LONG(srv->Frm, 4);
+        /** modification dicke **/
+        (void)COObjReset(srv->Obj, srv->Node, 0); //always start writes to domains from 0
+        /**					   **/
         err    = COObjWrValue(srv->Obj, srv->Node, (void*)&data, (uint8_t)size);
         if (err != CO_ERR_NONE) {
             if (srv->Abort > 0) {
