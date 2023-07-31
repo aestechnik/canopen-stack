@@ -122,6 +122,8 @@ typedef struct CO_CSDO_TRANSFER_T {
     uint8_t                TBit;        /*!< Segment toggle bit              */
 
     uint8_t 			   Tx_Attempt;   /*!< Tx Attempt Counter   AES Mod	 */
+    uint8_t				  *Flag;		 /*!< update running flag  AES Mod	 */
+    void				  *Actual;		 /*!< actual values to update AES Mod*/
 } CO_CSDO_TRANSFER;
 
 /*! \brief SDO CLIENT
