@@ -120,6 +120,8 @@ typedef struct CO_CSDO_TRANSFER_T {
     CO_CSDO_CALLBACK_T     Call;        /*!< Notification callback           */
     uint32_t               Buf_Idx;     /*!< Buffer Index                    */
     uint8_t                TBit;        /*!< Segment toggle bit              */
+
+    uint8_t 			   Tx_Attempt;   /*!< Tx Attempt Counter   AES Mod	 */
 } CO_CSDO_TRANSFER;
 
 /*! \brief SDO CLIENT
