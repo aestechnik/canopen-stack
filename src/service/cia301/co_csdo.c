@@ -83,6 +83,7 @@ static void COCSdoReset(CO_CSDO *csdo, uint8_t num, struct CO_NODE_T *node)
     csdonum->RxId  = CO_SDO_ID_OFF;
     csdonum->TxId  = CO_SDO_ID_OFF;
     csdonum->State = CO_CSDO_STATE_INVALID;
+    csdonum->NodeId = 0;
 
     /* Reset transfer context */
     csdonum->Tfer.Csdo    = csdonum;
@@ -139,6 +140,7 @@ static void COCSdoEnable(CO_CSDO *csdo, uint8_t num)
         ((txId & CO_SDO_ID_OFF) == (uint32_t)0)){
         csdonum->TxId  = txId + nodeId;
         csdonum->RxId  = rxId + nodeId;
+        csdonum->NodeId = nodeId;
         csdonum->State = CO_CSDO_STATE_IDLE;
     }
 }
