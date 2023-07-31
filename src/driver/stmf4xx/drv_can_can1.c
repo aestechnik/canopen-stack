@@ -198,6 +198,10 @@ static int16_t DrvCanSend(CO_IF_FRM *frm)
     frmHead.DLC   = frm->DLC;
     result = HAL_CAN_AddTxMessage(&DrvCan1, &frmHead, &frm->Data[0], &mailbox);
     if (result != HAL_OK) {
+    	//can buffer full
+    	if(DrvCan1.ErrorCode & HAL_CAN_ERROR_PARAM) {
+    		return(-2);
+    	}
         return (-1);
     }
     return (0u);

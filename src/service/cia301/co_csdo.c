@@ -703,7 +703,10 @@ CO_ERR COCSdoRequestDownload(CO_CSDO *csdo,
     ticks = COTmrGetTicks(&(csdo->Node->Tmr), timeout, CO_TMR_UNIT_1MS);
     csdo->Tfer.Tmr = COTmrCreate(&(csdo->Node->Tmr), ticks, 0, &COCSdoTimeout, csdo);
 
-    (void)COIfCanSend(&csdo->Node->If, &frm);
+    uint16_t err_int = COIfCanSend(&csdo->Node->If, &frm);
+    if(err_int == -2) {
+    	return CO_ERR_IF_CAN_SEND;
+    }
 
     return CO_ERR_NONE;
 }
