@@ -123,7 +123,7 @@ void CONodeProcess(CO_NODE *node)
 
     result = COIfCanRead(&node->If, &frm);
     if (result <= 0) {
-        allowed = 0;
+        allowed = CO_SYNC_ALLOWED; //only allow SYNC messages with DLC == 0
     } else {
         allowed = node->Nmt.Allowed;
 #if USE_LSS
