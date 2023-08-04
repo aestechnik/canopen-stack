@@ -705,6 +705,7 @@ CO_ERR COCSdoRequestDownload(CO_CSDO *csdo,
 
     uint16_t err_int = COIfCanSend(&csdo->Node->If, &frm);
     if(err_int == -2) {
+    	COTmrDelete(&(csdo->Node->Tmr), csdo->Tfer.Tmr); //instantly delete this timer, will timeout anyway
     	return CO_ERR_IF_CAN_SEND;
     }
 
