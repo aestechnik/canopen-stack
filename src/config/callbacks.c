@@ -228,3 +228,16 @@ void COTpdoReadData(CO_IF_FRM *frm, uint8_t pos, uint8_t size, CO_OBJ *obj)
      * needs a mapped values with a size larger than 4 byte.
      */
 }
+
+WEAK
+void COSdoFinal(struct CO_SDO_T *srv, struct CO_NODE_T *node, CO_OBJ *obj)
+{
+	(void)srv;
+	(void)node;
+	(void)obj;
+
+    /* Optional: place here some code, which is called
+     * when a SDO segmented transfer is finished on the receiver side.
+     */
+
+}

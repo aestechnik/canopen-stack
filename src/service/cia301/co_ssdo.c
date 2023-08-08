@@ -534,6 +534,9 @@ CO_ERR COSdoDownloadSegmented(CO_SDO *srv)
             COSdoAbort(srv, CO_SDO_ERR_HW_ACCESS);
             result = CO_ERR_SDO_ABORT;
         }
+
+        COSdoFinal(srv, srv->Node, srv->Obj);
+
         srv->Seg.Size = 0;
         srv->Seg.Num  = 0;
         srv->Obj      = 0;

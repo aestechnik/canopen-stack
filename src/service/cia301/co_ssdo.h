@@ -566,6 +566,22 @@ void COSdoAbortReq(CO_SDO *srv);
 */
 CO_ERR COTypeSdoIdWrite(struct CO_OBJ_T *obj, struct CO_NODE_T *node, void *buf, uint32_t size);
 
+/*! \brief  SDO SEGMENTED FINISHED DATA CALLBACK
+*
+*    This function is called during SDO final segment after SDO segmented
+*    transfer has written its buffer.
+*
+* \param frm
+*    Pointer to SDO server
+*
+* \param pos
+* 	 Pointer to Node
+*
+* \param size
+* 	 Pointer to the target object entry
+*/
+extern void COSdoFinal(struct CO_SDO_T *srv, struct CO_NODE_T *node, CO_OBJ *obj);
+
 #ifdef __cplusplus               /* for compatibility with C++ environments  */
 }
 #endif
