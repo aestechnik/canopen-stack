@@ -177,7 +177,9 @@ static void DrvCanEnable(uint32_t baudrate)
     DrvCan1.Init.ReceiveFifoLocked    = DISABLE;
     DrvCan1.Init.TransmitFifoPriority = DISABLE;
     HAL_CAN_Init(&DrvCan1);
+
     HAL_CAN_Start(&DrvCan1);
+	HAL_CAN_ActivateNotification(&DrvCan1,CAN_IT_RX_FIFO0_MSG_PENDING);
 }
 
 static int16_t DrvCanSend(CO_IF_FRM *frm)
