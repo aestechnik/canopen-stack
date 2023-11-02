@@ -45,8 +45,8 @@ typedef struct PIN_ASSIGN_T {
 ******************************************************************************/
 
 /* default pin assignment: CAN_RX -> PB8, CAN_TX -> PB9 */
-#define CAN1_PIN_RX_SEL  1
-#define CAN1_PIN_TX_SEL  1
+#define CAN1_PIN_RX_SEL  0
+#define CAN1_PIN_TX_SEL  0
 
 /******************************************************************************
 * PRIVATE VARIABLES
@@ -178,6 +178,20 @@ static void DrvCanEnable(uint32_t baudrate)
     DrvCan1.Init.TransmitFifoPriority = DISABLE;
     HAL_CAN_Init(&DrvCan1);
 
+    /* setup filter */
+	CAN_FilterTypeDef filterConfig;
+	filterConfig.FilterBank= 0;
+	filterConfig.FilterActivation = ENABLE;
+	filterConfig.FilterFIFOAssignment = 0;
+	filterConfig.FilterIdLow = 0;
+	filterConfig.FilterIdHigh = 0;
+	filterConfig.FilterMaskIdHigh = 0x0000;
+	filterConfig.FilterMaskIdLow = 0x0000;
+	filterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+	filterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+	HAL_CAN_ConfigFilter(&DrvCan1, &filterConfig);
+
+	/* start can and enable irq */
     HAL_CAN_Start(&DrvCan1);
 	HAL_CAN_ActivateNotification(&DrvCan1,CAN_IT_RX_FIFO0_MSG_PENDING);
 }
@@ -206,6 +220,7 @@ static int16_t DrvCanSend(CO_IF_FRM *frm)
     	}
         return (-1);
     }
+    //HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_6);
     return (0u);
 }
 
