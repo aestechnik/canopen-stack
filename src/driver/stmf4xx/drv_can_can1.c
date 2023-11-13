@@ -173,9 +173,9 @@ static void DrvCanEnable(uint32_t baudrate)
     DrvCan1.Init.TimeTriggeredMode    = DISABLE;
     DrvCan1.Init.AutoBusOff           = DISABLE;
     DrvCan1.Init.AutoWakeUp           = DISABLE;
-    DrvCan1.Init.AutoRetransmission   = DISABLE;
+    DrvCan1.Init.AutoRetransmission   = ENABLE;
     DrvCan1.Init.ReceiveFifoLocked    = DISABLE;
-    DrvCan1.Init.TransmitFifoPriority = DISABLE;
+    DrvCan1.Init.TransmitFifoPriority = ENABLE;
     HAL_CAN_Init(&DrvCan1);
 
     /* setup filter */
