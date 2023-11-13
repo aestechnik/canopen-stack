@@ -32,7 +32,7 @@
 *    will support.
 */
 #ifndef CO_CSDO_N
-#define CO_CSDO_N               1
+//#define CO_CSDO_N               1 	//define in can_cfg.h of board
 #endif
 
 /*! \brief DEFAULT EMERGENCY CODES
@@ -50,7 +50,7 @@
 *    will support.
 */
 #ifndef CO_RPDO_N
-#define CO_RPDO_N               4
+//#define CO_RPDO_N               4
 #endif
 
 /*! \brief DEFAULT TRANSMIT PDO
@@ -59,7 +59,7 @@
 *    will support.
 */
 #ifndef CO_TPDO_N
-#define CO_TPDO_N               4
+//#define CO_TPDO_N               4
 #endif
 
 /*! \brief DEFAULT ENABLE LSS
