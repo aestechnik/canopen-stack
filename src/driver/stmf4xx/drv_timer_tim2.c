@@ -146,9 +146,9 @@ static void DrvTimerReload(uint32_t reload)
     //TODO: check if this bug also happens with Release builds
     //probably happens during multiple debug interrupts while CNT is going up during timer creation
 
-	if(DrvTimer2.Instance->CNT > reload) {
-	    __HAL_TIM_SET_AUTORELOAD(&DrvTimer2, DrvTimer2.Instance->CNT + 100);
-	}
+//	if(DrvTimer2.Instance->CNT > reload) {
+//	    __HAL_TIM_SET_AUTORELOAD(&DrvTimer2, DrvTimer2.Instance->CNT + 100);
+//	}
 	#endif
 }
 

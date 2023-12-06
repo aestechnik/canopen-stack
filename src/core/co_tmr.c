@@ -539,9 +539,9 @@ static void COTmrRemove(CO_TMR *tmr, CO_TMR_TIME *tx)
             /* loop through used timers in list until timer is removed */
 
             tn = tmr->Use;
-            if(tn == 0) {
-            	goto recover;
-            }
+            //if(tn == 0) {
+            //	goto recover;
+            //}
             do {
                 /* remove next timer in list */
                 if (tn->Next == tx) {
@@ -558,7 +558,7 @@ static void COTmrRemove(CO_TMR *tmr, CO_TMR_TIME *tx)
                 }
                 tn = tn->Next;
             } while((tn != 0) && (tx != 0));
-            recover:;
+            //recover:;
         }
     }
 }
