@@ -62,8 +62,33 @@ void TIM2_IRQHandler(void)
     HAL_TIM_IRQHandler(&DrvTimer2);
 }
 
+void COTmrLock(void)
+{
+    /* This function helps to guarantee the consistancy
+     * of the internal timer management while interrupted
+     * by the used timer interrupt. Most likely you need
+     * at this point on of the following mechanisms:
+     * - disable the used hardware timer interrupt
+     * - get a 'timer-mutex' from your RTOS (ensure to
+     *   call COTmrService() in a timer triggered task)
+     */
+	NVIC_DisableIRQ(TIM2_IRQn);
+}
+
+void COTmrUnlock(void)
+{
+    /* This function helps to guarantee the consistancy
+     * of the internal timer management while interrupted
+     * by the used timer interrupt. Most likely you need
+     * at this point on of the following mechanisms:
+     * - (re)enable the used hardware timer interrupt
+     * - release the 'timer-mutex' from your RTOS (ensure
+     *   to call COTmrService() in a timer triggered task)
+     */
+	NVIC_EnableIRQ(TIM2_IRQn);
+}
+
 /******************************************************************************
-* PRIVATE FUNCTIONS
 ******************************************************************************/
 
 static void DrvTimerInit(uint32_t freq)
@@ -157,3 +182,4 @@ static void DrvTimerStop(void)
     /* stop the hardware timer counting */
     HAL_TIM_Base_Stop_IT(&DrvTimer2);
 }
+
