@@ -72,6 +72,7 @@ void COTmrLock(void)
      * - get a 'timer-mutex' from your RTOS (ensure to
      *   call COTmrService() in a timer triggered task)
      */
+	HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_9);
 	NVIC_DisableIRQ(TIM2_IRQn);
 }
 
@@ -85,6 +86,7 @@ void COTmrUnlock(void)
      * - release the 'timer-mutex' from your RTOS (ensure
      *   to call COTmrService() in a timer triggered task)
      */
+	HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_9);
 	NVIC_EnableIRQ(TIM2_IRQn);
 }
 
@@ -161,6 +163,7 @@ static uint32_t DrvTimerDelay(void)
     return (reload - current);
 }
 
+int32_t gap = 0;
 static void DrvTimerReload(uint32_t reload)
 {
     /* configure the next hardware timer interrupt */
@@ -171,8 +174,10 @@ static void DrvTimerReload(uint32_t reload)
     //TODO: check if this bug also happens with Release builds
     //probably happens during multiple debug interrupts while CNT is going up during timer creation
 
-	if(DrvTimer2.Instance->CNT > reload) {
-	    __HAL_TIM_SET_AUTORELOAD(&DrvTimer2, DrvTimer2.Instance->CNT + 100);
+    volatile uint32_t count = DrvTimer2.Instance->CNT;
+    gap = reload - count;
+	if(count > reload + 500) {
+	    __HAL_TIM_SET_AUTORELOAD(&DrvTimer2, DrvTimer2.Instance->CNT + 500);
 	}
 	#endif
 }
