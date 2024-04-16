@@ -116,7 +116,7 @@ static void DrvTimerInit(uint32_t freq)
      * (note: the timer reloads to 0 on this overflow)
      */
     DrvTimer2.Instance = TIM2;
-    DrvTimer2.Init.Prescaler = 16;					//scaled to fit current board config of APB1 = 16Mhz -> still 1 Mhz counter
+    DrvTimer2.Init.Prescaler = 90;					//scaled to fit current board config of APB1 = 90Mhz -> 1 Mhz counter
     DrvTimer2.Init.CounterMode = TIM_COUNTERMODE_UP;
     DrvTimer2.Init.Period = 4294967295;
     DrvTimer2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
