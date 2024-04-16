@@ -21,6 +21,8 @@
 #include "drv_can_can1.h"
 
 #include "stm32f4xx_hal.h"
+#include <string.h>
+
 
 /******************************************************************************
 * PRIVATE TYPE DEFINITION
@@ -90,6 +92,17 @@ static int16_t DrvCanRead   (CO_IF_FRM *frm);
 static void    DrvCanReset  (void);
 static void    DrvCanClose  (void);
 
+#define DRV_CAN_TPDO_BUF_LEN 3
+static uint32_t DrvCanTPdoNextId = 0;
+struct DrvCanTPdoBuf {
+	CO_IF_FRM frm[DRV_CAN_TPDO_BUF_LEN];
+
+	uint8_t next;
+	uint8_t send;
+};
+static struct DrvCanTPdoBuf DrvCanTPdoBuffer = { 0 };
+
+
 /******************************************************************************
 * PUBLIC VARIABLE
 ******************************************************************************/
@@ -114,7 +127,82 @@ const CO_IF_CAN_DRV STM32F4xx_CAN1_CanDriver = {
 //}
 
 /******************************************************************************
-* PRIVATE FUNCTIONS
+* PRIVATE FUNCTIONS TPDO BUFFER
+*
+* @brief The TPDO circular buffer is intended for implementations with 4+ concurrent TPDO sends.
+* 			In this case the STM internal CAN buffer of size 3 will overrun and TPDO 4 and higher are never sent.
+* 			To circumvent this case, each additional TPDO after internal CAN buffer max is reached, are put into a circular buffer and sent when Mailbox0 is empty.
+* 			This will only take TPDO frames into account and CAN_IT_TX_MAILBOX_EMPTY has to be activated outside of this driver for it to be enabled.
+*
+******************************************************************************/
+
+/**
+ * @brief send circular buffer frm
+ */
+static void DrvTPdoRun()
+{
+	uint8_t next = DrvCanTPdoBuffer.next;
+	while(DrvCanTPdoBuffer.send != next) {
+		DrvCanTPdoBuffer.send += 1;
+		if(DrvCanTPdoBuffer.send == DRV_CAN_TPDO_BUF_LEN) {
+			DrvCanTPdoBuffer.send = 0;
+		}
+
+		uint8_t send = DrvCanTPdoBuffer.send;
+
+		DrvCanSend(&DrvCanTPdoBuffer.frm[send]);
+	}
+}
+
+/**
+ * @brief queue circular buffer frm
+ */
+static void DrvTPdoQueue(CO_IF_FRM *frm)
+{
+	DrvCanTPdoBuffer.next += 1;
+	if(DrvCanTPdoBuffer.next == DRV_CAN_TPDO_BUF_LEN) {
+		DrvCanTPdoBuffer.next = 0;
+	}
+
+	if(DrvCanTPdoBuffer.next == DrvCanTPdoBuffer.send) {
+	    HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_9); //LED4_ERROR on rev1.1+ board
+	}
+
+	memcpy(&DrvCanTPdoBuffer.frm[DrvCanTPdoBuffer.next], frm, sizeof(CO_IF_FRM)); //drop oldest frame on buffer overrun
+}
+
+
+/**
+ * @brief signal TPDO frame
+ * 			only set a TPDO check + possible frm queue if DrvTPdoRun can be called via active CAN IRQ
+ */
+void COPdoTransmit(CO_IF_FRM *frm)
+{
+	if(DrvCan1.Instance->IER&(CAN_IT_TX_MAILBOX_EMPTY)) {
+		DrvCanTPdoNextId = frm->Identifier;
+	}
+}
+
+/**
+ * @brief start circular buffer send when Mailbox Tx0 opens up
+ */
+void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)
+{
+	DrvTPdoRun();
+}
+
+//void HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef *hcan)
+//{
+//	DrvTPdoRun();
+//}
+//
+//void HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef *hcan)
+//{
+//	DrvTPdoRun();
+//}
+
+/******************************************************************************
+* PRIVATE FUNCTIONS DrvCan Base
 ******************************************************************************/
 
 static void DrvCanInit(void)
@@ -212,18 +300,36 @@ static int16_t DrvCanSend(CO_IF_FRM *frm)
     /* fill identifier, DLC and data payload in transmit buffer */
     frmHead.StdId = frm->Identifier;
     frmHead.DLC   = frm->DLC;
+
+    //can buffer check
+    if(HAL_CAN_GetTxMailboxesFreeLevel(&DrvCan1) == 0) {
+    	if(DrvCanTPdoNextId == 0) {
+			HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_9); //LED4_ERROR on rev1.1+ board
+			return(-2);
+    	} else {
+    		DrvTPdoQueue(frm); //move data to software circular buffer and wait for open slot
+    		return (0u);
+    	}
+    }
+
     result = HAL_CAN_AddTxMessage(&DrvCan1, &frmHead, &frm->Data[0], &mailbox);
     if (result != HAL_OK) {
-    	//can buffer full
     	if(DrvCan1.ErrorCode & HAL_CAN_ERROR_PARAM) {
-    	    HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_9); //LED4_ERROR on rev1.1+ board
+			HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_9); //LED4_ERROR on rev1.1+ board
     		return(-2);
     	}
         return (-1);
     }
+
     HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_8); //LED3_CAN on rev1.1+ boards
+
+	if(DrvCanTPdoNextId != 0) {
+		DrvCanTPdoNextId = 0;
+	}
+
     return (0u);
 }
+
 
 static int16_t DrvCanRead (CO_IF_FRM *frm)
 {
