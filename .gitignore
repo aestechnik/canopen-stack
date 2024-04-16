@@ -9,3 +9,5 @@ Testing/*
 !.vscode/extensions.json
 /Release/
 /Debug/
+.settings/language.settings.xml
+/.settings
