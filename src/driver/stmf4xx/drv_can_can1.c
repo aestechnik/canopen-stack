@@ -216,12 +216,12 @@ static int16_t DrvCanSend(CO_IF_FRM *frm)
     if (result != HAL_OK) {
     	//can buffer full
     	if(DrvCan1.ErrorCode & HAL_CAN_ERROR_PARAM) {
-    	    //HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_9);
+    	    HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_9); //LED4_ERROR on rev1.1+ board
     		return(-2);
     	}
         return (-1);
     }
-    //HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_6);
+    HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_8); //LED3_CAN on rev1.1+ boards
     return (0u);
 }
 
