@@ -56,11 +56,17 @@ const CO_IF_TIMER_DRV STM32F4xx_TIM2_TimerDriver = {
 * PUBLIC FUNCTIONS
 ******************************************************************************/
 
+uint8_t lock = 0;
+
 /* ST HAL Timer2 Interrupt Handler */
 void TIM2_IRQHandler(void)
 {
+	if(lock) {
+		return;
+	}
     HAL_TIM_IRQHandler(&DrvTimer2);
 }
+
 
 void COTmrLock(void)
 {
@@ -72,7 +78,7 @@ void COTmrLock(void)
      * - get a 'timer-mutex' from your RTOS (ensure to
      *   call COTmrService() in a timer triggered task)
      */
-	HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_9);
+	lock = 1;
 	NVIC_DisableIRQ(TIM2_IRQn);
 }
 
@@ -86,7 +92,7 @@ void COTmrUnlock(void)
      * - release the 'timer-mutex' from your RTOS (ensure
      *   to call COTmrService() in a timer triggered task)
      */
-	HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_9);
+	lock = 0;
 	NVIC_EnableIRQ(TIM2_IRQn);
 }
 
