@@ -155,8 +155,17 @@ static void COEmcySend(CO_EMCY *emcy, uint8_t err, CO_EMCY_USR *usr, uint8_t sta
         frm.Data[1] = (uint8_t)0;
     }
     (void)CODictRdByte(dir, CO_DEV(0x1001,0), &frm.Data[2]);
-    for (n=0; n<5; n++) {
-        frm.Data[3+n] = 0;
+
+    /* custom AES EMCY usr */
+
+    //transfer EMCY Code as USR data
+    frm.Data[3] = (uint8_t)(data->Code);
+    frm.Data[4] = (uint8_t)(data->Code >> 8);
+
+    /* custom end */
+
+    for (n=0; n<3; n++) {
+        frm.Data[5+n] = 0;
     }
     if (usr != 0) {
         for (n=0; n<5; n++) {
