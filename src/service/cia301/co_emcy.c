@@ -21,6 +21,10 @@
 #include "co_core.h"
 #include "co_emcy.h"
 
+#if __has_include("can_app_emcy.h")
+#include "can_app_emcy.h"
+#endif
+
 /******************************************************************************
 * PRIVATE HELPER FUNCTIONS
 ******************************************************************************/
@@ -245,6 +249,9 @@ void COEmcySet(CO_EMCY *emcy, uint8_t err, CO_EMCY_USR *usr)
     if (change > 0) {
         COEmcyUpdate(emcy, err, usr, 1);
         COEmcySend  (emcy, err, usr, 1);
+		#if __has_include("can_app_emcy.h")
+        can_app_emcy_set_internal(err);
+		#endif
     }
 }
 
@@ -258,6 +265,9 @@ void COEmcyClr(CO_EMCY *emcy, uint8_t err)
     if (change > 0) {
         COEmcyUpdate(emcy, err, 0, 0);
         COEmcySend  (emcy, err, 0, 0);
+		#if __has_include("can_app_emcy.h")
+        can_app_emcy_clr_internal(err);
+		#endif
     }
 }
 
